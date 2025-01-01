@@ -1,0 +1,1 @@
+"source\distance_stop.c" BROWSE INCDIR(.\inc) DEBUG OBJECTEXTEND PRINT(.\distance_stop.lst) OBJECT(distance_stop.obj)

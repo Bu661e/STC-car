@@ -1,0 +1,13 @@
+"ir_re.obj",
+"btooth.obj",
+"buzzer.obj",
+"vibration.obj",
+"btn.obj",
+"dis.obj",
+"motor.obj",
+"light.obj",
+"main.obj",
+".\STCBSP_V3.6.LIB",
+"STARTUP.obj" 
+TO "demo" 
+RAMSIZE(256) 

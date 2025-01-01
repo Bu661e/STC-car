@@ -1,0 +1,52 @@
+C51 COMPILER V9.51   IR_CONTRL                                                             09/05/2024 15:13:32 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE IR_CONTRL
+OBJECT MODULE PLACED IN ir_contrl.OBJ
+COMPILER INVOKED BY: D:\Program_Files\my_serial\C51\BIN\C51.EXE ir_contrl.c BROWSE INCDIR(..\inc) DEBUG OBJECTEXTEND TAB
+                    -S(2)
+
+line level    source
+
+   1          #include "STC15F2K60S2.H"
+   2          #include "motor.h"  
+*** WARNING C318 IN LINE 2 OF ir_contrl.c: can't open file 'motor.h'
+   3          #include "direct.h"
+*** WARNING C318 IN LINE 3 OF ir_contrl.c: can't open file 'direct.h'
+   4          #include "speed.h"
+*** WARNING C318 IN LINE 4 OF ir_contrl.c: can't open file 'speed.h'
+   5          
+   6          
+   7          #include "uart2.h"
+   8          #include "uart1.h"
+   9          #include "ir.h"
+  10          #include "sys.H"                 
+  11          #include "Key.h"
+  12          #include "displayer.H" 
+  13          
+  14          
+  15          
+  16          
+  17          unsigned char buffer_ir[1];
+  18          
+  19          
+  20          void set_speed_and_direct_ir()
+  21          {
+  22   1        unsigned char inst = buffer_ir[0];
+  23   1        
+  24   1        if(inst > 0x10) Compare = inst & 0x0f; 
+*** ERROR C202 IN LINE 24 OF ir_contrl.c: 'Compare': undefined identifier
+  25   1        else my_direct = inst;
+*** ERROR C202 IN LINE 25 OF ir_contrl.c: 'my_direct': undefined identifier
+  26   1        
+  27   1      }
+  28          
+  29          void init_ir_contrl()
+  30          {
+  31   1        IrInit(NEC_R05d);
+  32   1        IrTxdSet(buffer_ir,1);
+  33   1        SetEventCallBack(enumEventIrRxd, set_speed_and_direct_ir);
+  34   1      }
+  35          
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  2 ERROR(S)

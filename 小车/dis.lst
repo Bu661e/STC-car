@@ -1,0 +1,122 @@
+C51 COMPILER V9.51   DIS                                                                   09/06/2024 13:38:41 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE DIS
+OBJECT MODULE PLACED IN dis.obj
+COMPILER INVOKED BY: D:\My_repositories\dcpt2\STC_bin\c51\C51\BIN\C51.EXE source\dis.c BROWSE INCDIR(.\inc) DEBUG OBJECT
+                    -EXTEND PRINT(.\dis.lst) OBJECT(dis.obj)
+
+line level    source
+
+   1          #include "STC15F2K60S2.H"
+   2          #include "motor.h"
+   3          #include "btooth.h"
+   4          #include "dis.h"
+   5          #include "btn.h"
+   6          #include "buzzer.h"
+   7          #include "ir_re.h"
+   8          #include "vibration.h"
+   9          #include "light.h"
+  10          
+  11          #include "direct.h"
+  12          #include "speed.h"
+  13          #include "model.h"
+  14          
+  15          
+  16          #include "uart2.h"
+  17          #include "uart1.h"
+  18          #include "sys.H"                 
+  19          #include "Key.h"
+  20          #include "displayer.H" 
+  21          #include "Beep.h"
+  22          #include "ir.h"
+  23          #include "vib.H"
+  24          
+  25          #ifdef _displayer_H_
+  26          
+  27          code char decode_table[] = {
+  28              0x3F, // "0" 0
+  29              0x06, // "1" 1
+  30              0x5B, // "2" 2
+  31              0x4F, // "3" 3
+  32              0x66, // "4" 4
+  33              0x6D, // "5" 5
+  34              0x7D, // "6" 6
+  35              0x07, // "7" 7
+  36              0x7F, // "8" 8
+  37              0x6F, // "9" 9
+  38              0x77, // "A" 10
+  39              0x7C, // "B" 11
+  40              0x39, // "C" 12
+  41              0x5E, // "D" 13
+  42              0x79, // "E" 14
+  43              0x71, // "F" 15
+  44              0x76, // "H" 16
+  45              0x38, // "L" 17
+  46              0x37, // "n" 18
+  47              0x3E, // "u" 19
+  48              0x73, // "P" 20
+  49              0x5C, // "o" 21
+  50              0x40, // "-" 22
+  51              0x80, // "." 23
+  52              0x00  // Unknown   24
+  53          };
+  54          
+C51 COMPILER V9.51   DIS                                                                   09/06/2024 13:38:41 PAGE 2   
+
+  55          #endif 
+  56          
+  57          unsigned char sign = 15;
+  58          
+  59          // unsigned char a;
+  60          // unsigned char b;
+  61          // unsigned char c;
+  62          // unsigned char d;
+  63          
+  64          void print_info()
+  65          {
+  66   1              switch (my_direct)
+  67   1              {
+  68   2                      case forward:
+  69   2                              sign = 15;
+  70   2                              break;
+  71   2                      case back:
+  72   2                              sign = 11;
+  73   2                              break;
+  74   2                      case left:
+  75   2                              sign = 17;
+  76   2                              break;
+  77   2                      case right:
+  78   2                              sign = 10;
+  79   2                              break;
+  80   2              }
+  81   1              
+  82   1              if(my_model == bluetooth) Seg7Print(11, 17, 24, 24, sign, 24, 24, Compare - 1);
+  83   1              else if(my_model == ir) Seg7Print(1, 10, 24, 24, sign, 24, 24, Compare - 1);
+  84   1              else Seg7Print(10, 5, 24, 24, sign, 24, 24, Compare - 1);
+  85   1              
+  86   1                       
+  87   1      }
+  88          
+  89          void init_dis()
+  90          {
+  91   1              DisplayerInit();
+  92   1          SetDisplayerArea(0, 7);
+  93   1              
+  94   1              SetEventCallBack(enumEventSys100mS, print_info);
+  95   1      }
+  96          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    141    ----
+   CONSTANT SIZE    =     25    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

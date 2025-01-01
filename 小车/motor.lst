@@ -1,0 +1,155 @@
+C51 COMPILER V9.51   MOTOR                                                                 09/06/2024 13:38:41 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE MOTOR
+OBJECT MODULE PLACED IN motor.obj
+COMPILER INVOKED BY: D:\My_repositories\dcpt2\STC_bin\c51\C51\BIN\C51.EXE source\motor.c BROWSE INCDIR(.\inc) DEBUG OBJE
+                    -CTEXTEND PRINT(.\motor.lst) OBJECT(motor.obj)
+
+line level    source
+
+   1          #include "STC15F2K60S2.H"
+   2          #include "motor.h"
+   3          #include "btooth.h"
+   4          #include "dis.h"
+   5          #include "btn.h"
+   6          #include "buzzer.h"
+   7          #include "ir_re.h"
+   8          #include "vibration.h"
+   9          
+  10          #include "direct.h"
+  11          #include "speed.h"
+  12          #include "model.h"
+  13          
+  14          
+  15          #include "uart2.h"
+  16          #include "uart1.h"
+  17          #include "sys.H"                 
+  18          #include "Key.h"
+  19          #include "displayer.H" 
+  20          #include "Beep.h"
+  21          #include "ir.h" 
+  22          #include "vib.H"
+  23          
+  24          
+  25          
+  26          void init_motor()
+  27          {
+  28   1              
+  29   1              P4M0 = 0x3f;               
+  30   1          P4M1 = 0x00;        // 推挽模式 
+  31   1              
+  32   1              SetEventCallBack(enumEventSys1mS, pwm);
+  33   1              
+  34   1              
+  35   1      }
+  36          
+  37          void go_forward()
+  38          {
+  39   1              
+  40   1              P41 = 0;
+  41   1              P42 = 1;        //左轮子向前
+  42   1              
+  43   1              P43 = 0;
+  44   1              P44 = 1;        //右轮子向前
+  45   1      }
+  46          
+  47          void go_back()
+  48          {
+  49   1              
+  50   1              P41 = 1;
+  51   1              P42 = 0;        
+  52   1              
+  53   1              P43 = 1;
+  54   1              P44 = 0;        
+C51 COMPILER V9.51   MOTOR                                                                 09/06/2024 13:38:41 PAGE 2   
+
+  55   1              
+  56   1      }
+  57          
+  58          void go_left()
+  59          {
+  60   1              P41 = 0;
+  61   1              P42 = 0;        
+  62   1              
+  63   1              P43 = 0;
+  64   1              P44 = 1;
+  65   1      }
+  66          
+  67          void go_right()
+  68          {
+  69   1              P41 = 0;
+  70   1              P42 = 1;        
+  71   1              
+  72   1              P43 = 0;
+  73   1              P44 = 0;
+  74   1      }
+  75          
+  76          void stop()
+  77          {
+  78   1              P41 = 0;
+  79   1              P42 = 0;        
+  80   1              
+  81   1      
+  82   1              P43 = 0;
+  83   1              P44 = 0;
+  84   1      }
+  85          
+  86          
+  87          unsigned char  Bound = 10, Compare = 1; //pwm
+  88          unsigned char  Counter = 0;
+  89          enum direct my_direct = forward;
+  90          
+  91          void pwm()
+  92          {
+  93   1              Counter++;
+  94   1              Counter %= Bound;
+  95   1              
+  96   1              LedPrint(Counter);
+  97   1              if(Counter < Compare)
+  98   1              {
+  99   2                      switch (my_direct)
+ 100   2                      {
+ 101   3                              case forward:
+ 102   3                                      go_forward();
+ 103   3                                      break;
+ 104   3                              case back:
+ 105   3                                      go_back();
+ 106   3                                      break;
+ 107   3                              case left:
+ 108   3                                      go_left();
+ 109   3                                      break;
+ 110   3                              case right:
+ 111   3                                      go_right();
+ 112   3                                      break;
+ 113   3                      }
+ 114   2              }
+ 115   1              else stop();
+ 116   1      }
+C51 COMPILER V9.51   MOTOR                                                                 09/06/2024 13:38:41 PAGE 3   
+
+ 117          
+ 118          
+ 119          void set_compare(int cmp)
+ 120          {
+ 121   1              Compare = cmp;
+ 122   1      }
+ 123          
+ 124          void set_mydirect(enum direct new_direct)
+ 125          {
+ 126   1              my_direct = new_direct;
+ 127   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    122    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

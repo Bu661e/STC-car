@@ -1,0 +1,66 @@
+C51 COMPILER V9.51   IR_RE                                                                 09/06/2024 13:38:41 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE IR_RE
+OBJECT MODULE PLACED IN ir_re.obj
+COMPILER INVOKED BY: D:\My_repositories\dcpt2\STC_bin\c51\C51\BIN\C51.EXE source\ir_re.c BROWSE INCDIR(.\inc) DEBUG OBJE
+                    -CTEXTEND PRINT(.\ir_re.lst) OBJECT(ir_re.obj)
+
+line level    source
+
+   1          #include "STC15F2K60S2.H"
+   2          #include "motor.h"
+   3          #include "btooth.h"
+   4          #include "dis.h"
+   5          #include "btn.h"
+   6          #include "buzzer.h"
+   7          #include "ir_re.h"
+   8          #include "vibration.h"
+   9          
+  10          #include "direct.h"
+  11          #include "speed.h"
+  12          #include "model.h"
+  13          
+  14          
+  15          #include "uart2.h"
+  16          #include "uart1.h"
+  17          #include "sys.H"                 
+  18          #include "Key.h"
+  19          #include "displayer.H" 
+  20          #include "Beep.h"
+  21          #include "ir.h"
+  22          #include "vib.H"
+  23          
+  24          unsigned char buffer_ir[1];
+  25          
+  26          
+  27          void set_speed_and_direct_ir()
+  28          {
+  29   1              unsigned char inst = buffer_ir[0];
+  30   1              
+  31   1              if(inst > 0x10) Compare = inst & 0x0f; 
+  32   1              else my_direct = inst  & 0x07;
+  33   1              
+  34   1      }
+  35          
+  36          void init_ir()
+  37          {
+  38   1              IrInit(NEC_R05d);
+  39   1              SetIrRxd(buffer_ir,1);
+  40   1              SetEventCallBack(enumEventIrRxd, set_speed_and_direct_ir);
+  41   1      
+  42   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     46    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,273 @@
+C51 COMPILER V9.51   MAIN                                                                  09/06/2024 11:59:36 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\Program_Files\my_serial\C51\BIN\C51.EXE main.c BROWSE INCDIR(..\inc) DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "STC15F2K60S2.H"
+   2          #include "sys.H"
+   3          #include "displayer.H"
+   4          #include "beep.H" 
+   5          #include "key.h"
+   6          #include "uart2.h"
+   7          #include "math.h"
+   8          #include "beep.h"
+   9          #include "ir.h"
+  10          #include "adc.h"
+  11          #include "DS1302.h"
+  12          #include "ADXL345_Func.h"
+  13          code  unsigned long SysClock=11059200;
+  14          
+  15          #ifdef _displayer_H_
+  16          code char decode_table[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f, 0x77, 0x7C, 0x39, 0x5E, 0x79,
+             - 0x71,
+  17                          /* –Ú∫≈:   0   1    2    3    4     5    6    7   8    9   10    11   12   13    14     15    
+             - */
+  18                          /* œ‘ æ:   0   1    2    3    4     5    6    7   8    9     A      B     C     D     E     F */ 
+             - 
+  19                                   0x3f|0x80,0x06|0x80,0x5b|0x80,0x4f|0x80,0x66|0x80,0x6d|0x80,0x7d|0x80,0x07|0x80,0x
+             -7f|0x80,0x6f|0x80,
+  20                       /* ¥¯–° ˝µ„     0         1         2         3         4         5         6         7      
+             -   8         9        */
+  21                                      0x00,0x08,0x40,0x01, 0x41, 0x48,0x3D,
+  22                                    
+  23                        /*            (Œﬁ)   œ¬-  ÷–-  …œ-  …œ÷–-  ÷–œ¬-        G       */
+  24                          /*        26    27     28     29    30    31    32        */
+  25                                    0x76, 0x10, 0x0E, 0x7A, 0x38, 0x55, 0x54, 
+  26                        /*          H      I      J     K     L     M     N       */
+  27                          /*        33    34     35     36    37    38    39        */  
+  28                                    0x5C, 0x73, 0x67,       0x50, 0x65, 0x78, 
+  29                          /*          O      P    Q           R     S     T           */
+  30                          /*        40    41     42         43    44    45        */  
+  31                                    0x3E, 0x1C, 0x6A, 0x64, 0x6E, 0x5A, 
+  32                          /*          U      V    W     X     Y     Z         */
+  33                          /*        46    47     48    49     50     51       */  
+  34          
+  35                        /*–°–¥abcd£¨¥”52ø™ º*/            
+  36                                    0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d,
+  37                                    0x76, 0x0f, 0x0e, 0x75, 0x38, 0x37, 0x54,
+  38                                    0x5c, 0x73, 0x67,         0x31, 0x49, 0x78,
+  39                                    0x3e, 0x1c, 0x7e, 0x64, 0x6e, 0x59};
+  40          #endif
+  41          
+  42          char KeyPressing=0;
+  43          char initing=0; //ø™ª˙«∞–Ë≥ı ºªØ
+  44          unsigned char carSpeed=0x11;
+  45          unsigned char sendBuffer[1];
+  46          unsigned char ir_command = 0x00;
+  47                                    
+  48          #define THRESHOLD_ANGLE 30       // Ω«∂»±‰ªØ„–÷µ£¨”√”⁄≈–∂œ∑≠◊™ ÷ ∆
+  49          #define THRESHOLD_ACCELERATION 50U //º”ÀŸ∂»±‰ªØ„–÷µ£¨”√”⁄≈–∂œ∆Ω“∆ ÷ ∆  
+  50          
+C51 COMPILER V9.51   MAIN                                                                  09/06/2024 11:59:36 PAGE 2   
+
+  51                                    
+  52          //∑¢ÀÕ÷∏¡Ó
+  53          void send2car(unsigned char carCommand){
+  54   1            sendBuffer[0]=carCommand;
+  55   1            IrPrint(sendBuffer,1);
+  56   1          //  Uart2Print(sendBuffer,1);
+  57   1      }     
+  58          
+  59          //ÀŸ∂»µ˜’˚
+  60          void speed_callback(){
+  61   1      
+  62   1        //µ˜’˚ÀŸ∂»
+  63   1        if(GetAdcNavAct(enumAdcNavKeyUp) == enumKeyPress){
+  64   2          carSpeed++;
+  65   2          SetBeep(800,18);
+  66   2        }
+  67   1        if(GetAdcNavAct(enumAdcNavKeyDown) == enumKeyPress){
+  68   2          carSpeed--;
+  69   2          SetBeep(800,18);
+  70   2        }  
+  71   1        if(GetAdcNavAct(enumAdcNavKeyCenter) == enumKeyPress){
+  72   2          carSpeed=0x11;
+  73   2          SetBeep(800,18);
+  74   2        } 
+  75   1        if(carSpeed < 0x11 || carSpeed  > 0x1a){
+  76   2            if(carSpeed < 0x11)carSpeed=0x11;
+  77   2            if(carSpeed > 0x1a)carSpeed=0x1a;
+  78   2        } 
+  79   1        send2car(carSpeed);
+  80   1      }
+  81          
+  82          //∂Ø◊˜÷∏¡Ó ∂±                          
+  83          void Gesture_Recognition(){
+  84   1      
+  85   1        //æ≤÷πÃ¨œ‘ æcar∫ÕÀŸ∂»
+  86   1          Seg7Print(12,10,43,26,47,carSpeed&0x0f,26,28);  
+  87   1      
+  88   1        
+  89   1          //∑≠◊™
+  90   1        if(accZ_f > THRESHOLD_ACCELERATION){
+  91   2          
+  92   2          //«∞∫Û∑≠◊™£®≤ª∞¥K1£©  //«∞
+  93   2        if(angleY_f > THRESHOLD_ANGLE  && angleX_f < THRESHOLD_ANGLE  && KeyPressing==0){
+  94   3          Seg7Print(12,10,43,26,47,carSpeed&0x0f,26,15);
+  95   3          ir_command=0x01;
+  96   3          send2car(ir_command);
+  97   3        } 
+  98   2        //«∞∫Û∑≠◊™£®∞¥K1£©  //∫Û
+  99   2        else if(angleY_f > THRESHOLD_ANGLE  && angleX_f < THRESHOLD_ANGLE && KeyPressing==1){
+ 100   3          Seg7Print(12,10,43,26,47,carSpeed&0x0f,26,11);
+ 101   3          ir_command=0x04;
+ 102   3          send2car(ir_command);
+ 103   3        }   
+ 104   2      
+ 105   2        //◊Û”“∑≠◊™£®≤ª∞¥K1£©//◊Û 
+ 106   2        else if(angleX_f > THRESHOLD_ANGLE && angleY_f < THRESHOLD_ANGLE && KeyPressing==0 ){
+ 107   3          Seg7Print(12,10,43,26,47,carSpeed&0x0f,26,37);
+ 108   3          ir_command=0x02;
+ 109   3          send2car(ir_command);
+ 110   3        }
+ 111   2        //◊Û”“∑≠◊™£®∞¥K1£© //”“
+ 112   2        else if(angleX_f > THRESHOLD_ANGLE   && angleY_f < THRESHOLD_ANGLE && KeyPressing==1){
+C51 COMPILER V9.51   MAIN                                                                  09/06/2024 11:59:36 PAGE 3   
+
+ 113   3          Seg7Print(12,10,43,26,47,carSpeed&0x0f,26,43);
+ 114   3          ir_command=0x03;
+ 115   3          send2car(ir_command);
+ 116   3        } 
+ 117   2      
+ 118   2      }
+ 119   1      
+ 120   1      }
+ 121          
+ 122          unsigned char ir_counter=0; 
+ 123          //≥ı ºªØÕÍ≥…∫Û√ø50ms ∂±“ª¥Œ ÷ ∆
+ 124          void my10mS_callback(){
+ 125   1        
+ 126   1        if(initing<4)return;
+ 127   1        if(ir_counter==5)ir_counter=0;
+ 128   1        
+ 129   1        Multiple_Read_ADXL345();//ªÒ»°≤Œ ˝
+ 130   1        ACC_XYZ(2);// µ ±ªÒ»°Ω«∂»∫Õº”ÀŸ∂»£®∆Ωæ˘÷µ£©  
+ 131   1      
+ 132   1        if(ir_counter==1){
+ 133   2        Gesture_Recognition();// ∂±∂Ø◊˜
+ 134   2        }
+ 135   1      
+ 136   1        ir_counter++;
+ 137   1      }
+ 138          
+ 139          
+ 140          void myKey_callback(){
+ 141   1      
+ 142   1        char k;
+ 143   1        
+ 144   1        // π”√K2≥ı ºªØ∑ΩœÚ£®3¥Œ-X£¨Y£¨Z£©
+ 145   1        k=GetKeyAct(enumKey2);
+ 146   1          if(initing==3 && k == enumKeyPress ){
+ 147   2              Seg7Print(26,26,26,26,0,26,26,26);
+ 148   2              offX=(x0g[0]+x0g[1])/2;
+ 149   2              offY=(y0g[0]+y0g[1])/2;
+ 150   2              offZ=(z0g[0]+z0g[1])/2;
+ 151   2              factorX=(double)1000/abs(x1g-offX);
+ 152   2              factorY=(double)1000/abs(y1g-offY);
+ 153   2              factorZ=(double)1000/abs(z1g-offZ);
+ 154   2              initing++;
+ 155   2      }
+ 156   1          if(initing==2 && k == enumKeyPress ){  
+ 157   2            Seg7Print(26,26,26,1,26,26,26,26);
+ 158   2            Multiple_Read_ADXL345();
+ 159   2            x0g[0]=(Buffer[1]<<8)+Buffer[0];
+ 160   2            y0g[0]=(Buffer[3]<<8)+Buffer[2];
+ 161   2            z1g=(Buffer[5]<<8)+Buffer[4];
+ 162   2            initing++;
+ 163   2      }
+ 164   1      
+ 165   1        if(initing==1 && k == enumKeyPress ){ 
+ 166   2            Seg7Print(26,26,26,2,26,26,26,26);
+ 167   2            Multiple_Read_ADXL345();
+ 168   2            x0g[1]=(Buffer[1]<<8)+Buffer[0];
+ 169   2            z0g[1]=(Buffer[5]<<8)+Buffer[4];
+ 170   2            y1g=(Buffer[3]<<8)+Buffer[2];
+ 171   2            initing++;
+ 172   2      }
+ 173   1        if(initing==0 && k == enumKeyPress ){
+ 174   2          Seg7Print(26,26,26,3,26,26,26,26);
+C51 COMPILER V9.51   MAIN                                                                  09/06/2024 11:59:36 PAGE 4   
+
+ 175   2          Multiple_Read_ADXL345();//Ω´∂‡∏ˆºƒ¥Ê∆˜÷µ∂¡»°µΩBuffer ˝◊È÷–
+ 176   2            z0g[0]=(Buffer[5]<<8)+Buffer[4];
+ 177   2            y0g[1]=(Buffer[3]<<8)+Buffer[2];
+ 178   2            x1g=(Buffer[1]<<8)+Buffer[0];
+ 179   2            initing++;
+ 180   2      }
+ 181   1      
+ 182   1        //K1∞¥º¸◊¥Ã¨
+ 183   1        k=GetKeyAct(enumKey1);
+ 184   1        if( k == enumKeyPress ) KeyPressing=1;
+ 185   1          else if( k == enumKeyRelease ) KeyPressing=0;
+ 186   1      
+ 187   1      }
+ 188          
+ 189          
+ 190          void main()
+ 191          {
+ 192   1        DisplayerInit();  
+ 193   1        KeyInit();
+ 194   1        AdcInit(ADCexpEXT);
+ 195   1        Init_ADXL345();
+ 196   1        BeepInit();
+ 197   1        LedPrint(0);
+ 198   1        IrInit(NEC_R05d);
+ 199   1        SetDisplayerArea(0,7);
+ 200   1        Uart2Init(9600,Uart2Usedfor485);
+ 201   1      
+ 202   1        
+ 203   1        Delay(500);                    //…œµÁ—” ±   
+ 204   1        P0M1=0x00;
+ 205   1        P0M0=0xff;
+ 206   1                  
+ 207   1        
+ 208   1          //ºÏ—ÈADXL345–æ∆¨ «∑Òø…∑√Œ            
+ 209   1        if(Single_Read_ADXL345(0x00)==0xE5)           //0°™°™≤ªƒ‹∑√Œ    // 1°™°™ø…∑√Œ £®¥˝ª˙ƒ£ Ω£©
+ 210   1         {                        //                             2°™°™ø…∑√Œ £®≤‚¡øƒ£ Ω°¢’˝≥£«Èøˆœ¬£©
+ 211   2              Seg7Print(10, 10, 10, 10, 10, 10, 10, 1);                                     //∂¡≥ˆµƒ ˝æ›Œ™0XE5,±Ì 
+             -æ ±–Ú’˝»∑, œ‘ æ°∞1°± 
+ 212   2              if(Single_Read_ADXL345(0x2D)==0x08) Seg7Print(26,26,26,26,26,26,26,2);    //∂¡≥ˆµƒ ˝æ›Œ™0x08 ±Ì æ∏
+             -¯345…œµÁ¡À£¨œ‘ æ°∞2°±
+ 213   2         }
+ 214   1        else   Seg7Print(10, 10, 10, 10, 10, 10, 10, 0);                  //œ‘ æ°∞0°± 
+ 215   1      
+ 216   1         
+ 217   1        Seg7Print(26,11, 14, 15, 40, 43, 14, 26);
+ 218   1      
+ 219   1        Multiple_Read_ADXL345();//Ω´∂‡∏ˆºƒ¥Ê∆˜÷µ∂¡»°µΩBuffer ˝◊È÷–
+ 220   1        offX=(Buffer[1]<<8)+Buffer[0];
+ 221   1        offY=(Buffer[3]<<8)+Buffer[2];
+ 222   1        offZ=(Buffer[5]<<8)+Buffer[4];         
+ 223   1      
+ 224   1        SetEventCallBack(enumEventSys10mS, my10mS_callback);
+ 225   1        SetEventCallBack(enumEventKey, myKey_callback);
+ 226   1        SetEventCallBack(enumEventNav,speed_callback);
+ 227   1         MySTC_Init();            
+ 228   1          while(1)                 
+ 229   1              { 
+ 230   2      
+ 231   2                MySTC_OS();    
+ 232   2              }      
+ 233   1      }
+ 234          
+C51 COMPILER V9.51   MAIN                                                                  09/06/2024 11:59:36 PAGE 5   
+
+ 235          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1478    ----
+   CONSTANT SIZE    =     82    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

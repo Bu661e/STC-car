@@ -1,0 +1,7 @@
+"STARTUP.obj",
+"..\STCBSP_V3.6.LIB",
+"main.obj",
+"ADXL345_Func.obj",
+"ADXL345.obj" 
+TO "car_control1" 
+RAMSIZE(256) 

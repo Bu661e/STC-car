@@ -1,0 +1,56 @@
+C51 COMPILER V9.51   BUZZER                                                                09/06/2024 13:38:41 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE BUZZER
+OBJECT MODULE PLACED IN buzzer.obj
+COMPILER INVOKED BY: D:\My_repositories\dcpt2\STC_bin\c51\C51\BIN\C51.EXE source\buzzer.c BROWSE INCDIR(.\inc) DEBUG OBJ
+                    -ECTEXTEND PRINT(.\buzzer.lst) OBJECT(buzzer.obj)
+
+line level    source
+
+   1          #include "STC15F2K60S2.H"
+   2          #include "motor.h"
+   3          #include "btooth.h"
+   4          #include "dis.h"
+   5          #include "btn.h"
+   6          #include "buzzer.h"
+   7          #include "ir_re.h"
+   8          #include "vibration.h"
+   9          
+  10          #include "direct.h"
+  11          #include "speed.h"
+  12          #include "model.h"
+  13          
+  14          
+  15          #include "uart2.h"
+  16          #include "uart1.h"
+  17          #include "sys.H"                 
+  18          #include "Key.h"
+  19          #include "displayer.H" 
+  20          #include "Beep.h"
+  21          #include "ir.h"
+  22          #include "vib.H"
+  23          
+  24          void init_buzzer()
+  25          {
+  26   1              BeepInit();
+  27   1      }
+  28          
+  29          void make_noise()
+  30          {
+  31   1              SetBeep(2400, 200);
+  32   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     14    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
